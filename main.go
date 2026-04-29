@@ -45,14 +45,26 @@ func connect() (*mongo.Client, error) {
 
 func main() {
 
-	err:= connect()
+	client, err := connect()
 	if err != nil {
 		log.Fatal(err) 
-	} 
+	}
+	mg.Client = client
+	mg.Db = client.Database(dbName)
 	 app:=fiber.New()
 
 	 app.Get("/employees",func (c *fiber.Ctx) error{
-		return c.SendString("Get all employees")
+		query := bson.D{}
+		cursor,err:= mg.Db.Collection("employees").Find(c.Context(),query)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+		var employees []Employee = make([]Employee,0)
+		cursor.All(c.Context(),&employees)
+		if err := cursor.All(c.Context(),&employees); err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+		return c.JSON(employees)
 	 })
 	 app.Post("/employees")
 	 app.Put("/employees/:id")
