@@ -7,7 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	// "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -66,8 +66,11 @@ func main() {
 		}
 		return c.JSON(employees)
 	 })
-	 app.Post("/employees")
-	 app.Put("/employees/:id")
-	 app.Delete("/employees/:id")
-
+	 app.Get("/",func (c *fiber.Ctx) error {
+		return c.SendString("Welcome to the Fiber HRMS API")
+	 })
+	//  app.Post("/employees")
+	//  app.Put("/employees/:id")
+	//  app.Delete("/employees/:id")
+   log.Fatal(app.Listen(":3000"))
 }
